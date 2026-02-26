@@ -1,0 +1,186 @@
+# TradeMind 项目记忆与上下文 (Context & Memory)
+
+> **定位**: 交接细节、每日进展、短期记忆闭环。  
+> **白皮书**: [VISION](./VISION.md) | **看板**: [BOARD](./task/BOARD.md)
+
+---
+
+## ✅ 完成记录 (Log #20260226-1)
+
+> **时间**: 2026-02-26 00:55  
+> **内容**: 确立 Arena 与策略的 Skill 化架构构想
+- **沉淀架构洞察**: 提出了将 Arena 竞技场定义为“协议型 Skill”及其交易策略为“能力型 Skill”的构想。
+- **文件归档**: 创建 [INS-005: 将 Arena 竞技场与交易策略 Skill 化的架构洞察](./insights/INS-005-arena-strategy-as-skills.md)。
+- **后续规划**: 建议基于此构想重构 `GridContestant` 为标准 Skill 示例。
+
+---
+
+## ✅ 完成记录 (Log #20260223-1)
+
+> **时间**: 2026-02-23 16:55  
+> **内容**: 架构大整编与文档体系闭环
+
+### 项目管理与协作体系重构 (2026-02-23)
+- **确立“白皮书-看板-记忆”三级架构**:
+  - **战略白皮书**: 整合 VISION、ROADMAP 与 INSIGHTS (开启 INS-XXX 编号体系)。
+  - **战术看板**: 建立 [docs/task/BOARD.md](./task/BOARD.md)，替代原 `todo/` 目录。
+  - **人机协作 (VibeCoding)**: 确立“脑内运行文件 ➔ 物理看板同步 ➔ 执行报告归档”的文件驱动模式。
+- **架构蓝图升级**: 
+  - 将 Agent 构建层扩展为 **8 大核心模块**（感知、思考、行动、记忆、自主、进化、节点、渠道）。
+  - 详细定义见 [INS-002: Agent 构建层框架](./insights/INS-002-agent-construction-layer-framework.md)。
+- **物理实现策略**: 针对 Node 和 Channel 确立了“接口保留、初期固化本地实现”的务实路线。
+
+---
+
+## ✅ 今日完成 (2026-02-21) - W3 进行中
+
+### K 线可视化系统与数据库稳定性
+- **KlinePriceChart**: 实现支持"过去/未来"明暗分割的高性能 K 线图表，集成买卖标记渲染。
+- **垂直进度线**: 开发基于 CSS overlay 的动态进度线，通过 `timeToCoordinate` 精确定位，解决绘图库原生线条抖动问题。
+- **DuckDB 核心修复**: 
+  - 修复 `unique_ptr NULL` 崩溃：统一所有模块通过 `MarketDatabase` 使用 `globalThis` 锁定单例，消除并发冲突。
+  - 增强连通性：实现 `READ_ONLY` 模式自动回退与健康检查，确保 HMR 过程中数据库连接不中断。
+
+### Arena UI & 交易详情增强
+- **选手过滤**: 增加“选手详情”快捷按钮，Tab 区域支持选手级日志/交易纪录过滤。
+- **交易表格**: 增加 `金额 (USDT)` 列，直观对比每笔成交的实际耗费或套现。
+- **回测步进同步**: `RaceController` 进度上报与前端 K 线指示器实现 ms 级时间同步。
+
+### Scalper 性能诊断实验
+- **对照实验**: `tests/scalper-diagnosis.spec.ts` 对比 1h vs 12h 步长回测。
+- **结论**: 12h 步长导致 Scalper "窒息"，交易次数极低。1h 步长显著提升交易活跃度，能捕捉 RSI 超买超卖信号。
+- **建议**: 高频策略回测步长推荐 60-120 分钟。
+
+### Scalper 提示词优化
+- **Few-shot 范例**: 为 Scalper 引入经典波段交易案例（RSI 超买止盈场景）。
+- **分仓引导**: 建议 25% 试探、50% 核心持仓。
+- **注意**: Strategy 和 Indicator 提示词保持不变，仅 Scalper 被修改。
+
+---
+
+## ✅ 今日完成 (2026-02-20) - W2 完成
+
+### LLM 单兵变体系统
+- **三种变体实现**: Lite / Indicator / Strategy
+  - Lite: 24h 价格 CSV（基础）
+  - Indicator: 价格 + RSI/SMA/MACD 当前值 + **24h 指标历史**
+  - Strategy: Indicator + 日线 + 策略建议（评分0-10）
+- **Arena UI 平铺显示**: 默认显示三种 LLM 变体，可独立配置
+- **配置持久化**: `.env.local` 支持 MiniMax API Key
+
+### 日志系统增强
+- **状态日志**: 每次 Tick 记录价格、BTC 持仓、USDT 余额、总权益
+- **决策日志**: 记录 LLM 决策 + 可折叠的 Prompt/Response
+- **前端展示**: 实时日志面板显示仓位变化和 LLM 输入输出
+
+### 图表优化
+- **Tooltip 修复**: 显示 BTC 持仓数量和 USDT 余额（不再是0）
+- **Tooltip 持久化修复**: 鼠标离开图表区域自动隐藏
+
+### 分析层 Tools
+- `analysis-tools.ts`: RSI/SMA/EMA/MACD 计算函数
+- `createAnalysisTools`: 服务端 Tool 注册
+- 24h 指标历史计算（每根小时线的指标值）
+
+### 默认配置调整
+- 步长: 15分钟 → **720分钟（12小时）**
+- DCA 间隔: 1440分钟 → **10080分钟（7天）**
+
+### 测试
+- 24+ 个单元测试全部通过
+- Playwright 集成测试验证 UI 交互
+
+---
+
+## ✅ 今日完成 (2026-02-20) - 策略验证与优化
+
+### Indicator 提示词优化
+- **问题发现**: Lite（数据少）反而胜出，Indicator/Strategy 过于保守
+- **根因分析**: RSI 30/70 阈值限制，错过震荡行情机会
+- **解决方案**: 移除硬性规则，改为开放式提示词
+  - 旧: "RSI(超买>70/超卖<30)"
+  - 新: "RSI(14)：衡量价格强弱(0-100)，自主判断"
+- **效果**: 给予 LLM 更大决策自由度
+
+### 新增 LLM-Scalper 高频波段选手
+- **定位**: 高频波段，积少成多
+- **数据输入**: Indicator 级别（RSI/SMA/MACD + 24h历史）
+- **交易理念**: 
+  - 小利即出，逢低吸纳
+  - 自主决策，没有固定阈值束缚
+- **输入数据特色**: 
+  - 浮盈亏状态
+  - 24h价格区间位置
+  - 分析角度参考（非规则）
+
+### 回测验证结果（7天，步长12小时）
+| 选手 | 收益率 | 表现 |
+|------|--------|------|
+| DCA | -3.78% | 基准 |
+| Scalper | -6.29% | ❌ 跑输 DCA |
+
+**初步结论**: 
+- 12小时步长可能过长，错过日内波段
+- 2025年初行情可能不适合高频策略
+- 需进一步诊断交易记录
+
+### Arena 历史存档系统
+- 创建 `docs/arena-history/` 目录结构
+- 设计比赛数据导出功能（JSON格式）
+- 模板化报告格式（report.md + config.json + data.json）
+
+### 配置面板功能规划（Future - 非紧急）
+- 记录详细设计文档: `docs/todo/future-arena-config-panel.md`
+- 功能: 基于模板创建自定义选手，微调数据输入和提示词
+- **状态**: 待 LLM 策略验证有效后实现
+
+---
+
+## ✅ 历史完成
+
+### 2026-02-20
+- **Arena 实时图表优化**: 修改 `RaceController` 采集频率为每步更新，修复大步长回测图表断流问题。
+- **净值计算逻辑修复**: 实现全局资产定时重估（Global Revaluation），解决选手持仓不交易时净值曲线呈横线的 Bug。
+- **MiniMax API 深度优化**:
+    - 切换为性价比模型 `MiniMax-Text-01`。
+    - 引入极简 CSV 数据格式，单次 Token 消耗降低 60%。
+    - 实现 1m 数据手动聚合为 1h 采样逻辑，解决 LLM 获取不到价格数据的 Bug。
+- **架构共识确立**: 明确"数据层-分析层-信号层"三层架构及"双模块驱动（外部泵 vs 内部心脏）"逻辑。
+- **文档重构**: 更新了 VISION.md 和 ROADMAP.md，将协作效率验证作为 v0.1 核心指标。
+- **Git 同步**: 成功将代码库更新至最新版本，修复了 .gitignore 格式问题。
+
+### 2026-02-19
+- 架构决策：确认将架构改为"虚拟时钟注入"模式（方案 B），提升回测与实盘的统一性。
+- 架构分析：明确 FeedBus 的定位为 MAS 内部观点共享机制，数据层由 DB 控制时间边界提供。
+- 文档更新：创建了 [ADR-003-backtest-framework.md](./architecture/ADR-003-backtest-framework.md) 记录回测框架设计。
+- 规划实现：制定了包含 VirtualClock、Contestant 接口及 RaceController 的实现计划。
+
+### 2026-02-18
+- 文档系统重构：创建 VISION.md、ROADMAP.md，归档过时文档
+- 架构设计：创建 ADR-002 预测闭环、量化指标指南
+- 项目启动验证：代码运行成功，图表页面正常
+- 修复 cfo.ts 导入错误
+
+---
+
+## 📋 接下来要做 (W3 后续)
+
+## ⏭️ 接力点 (Next #20260223-1)
+
+> **交接时间**: 2026-02-23 17:00  
+> **当前上下文**: 已完成 `BaseAgent` 源代码侦察，确认了 AAAgent 品牌术语与 VibeCoding 文档体系的全面一致性。
+
+### 1. 物理层接口定义 (Physical First)
+- [ ] 在 `my-app/lib/agents/types/` 定义 `INode` 与 `IChannel`。
+- [ ] 在 `my-app/lib/agents/physical/` 实现 `LocalNode.ts` 与 `ConsoleChannel.ts`。
+
+### 2. BaseAAAgent 骨架开发
+- [ ] 创建 `my-app/lib/agents/base-aa-agent.ts`，作为 AAAgent 的核心抽象类。
+- [ ] 整合 8 大模块生命周期（感知-思考-行动-状态循环）。
+- [ ] 基于 ADR-005 的时钟注入机制重新封装 `Scheduler`。
+
+### 3. 文档联动测试
+- [ ] 完成第一个文件变更后，生成 `walkthrough.md` 并归档，验证 VibeCoding Skill 是否执行到位。
+
+### Future（非紧急）
+- [ ] **配置面板**: 选手自定义配置系统（已设计，待实现）
