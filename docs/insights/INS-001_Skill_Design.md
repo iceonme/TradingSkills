@@ -14,9 +14,9 @@ Trading Skills (TS) 是为加密交易场景专门设计的标准化能力工具
 为了实现极致的架构解耦与防冗余（DRY），TS 内部将技能从逻辑上严格划分为两类：**交易执行型 (Execution Skills)** 与 **策略型 (Strategy Skills)**。
 
 ### 2.1 基础设施型 Skill (Infrastructure Skills)
-此类 Skill 是系统的底层基建，分为“读”和“写”两个标准化维度：
-- **交易执行型 (`trading_exe`)**: 负责“写”操作。类似于“交易 ERC 标准”，提供统一的挂单、撤单、资产查询接口。
-- **数据枢纽型 (`data_hub`)**: 负责“读”操作。提供统一的数据拉取标准，涵盖 K 线行情、实时 Tick、舆情热度及宏观日历等数据源。它让上层策略无需关心数据是从 OKX、Binance 还是 Twitter 爬虫来的。
+此类 Skill 是系统的底层基建，作为**一级公民**存在于 `skills/` 目录下，直接供 Agent 调用：
+- **交易执行型 (`skills/trading_exe`)**: 负责“写”操作。这是整个系统的“手”，任何 Agent (PA 或 OpenClaw) 只要读懂了它的 `SKILL.md`，就能通过它直接管理账户和下达订单。
+- **数据枢纽型 (`skills/data_hub`)**: 负责“读”操作。提供统一的数据拉取标准。
 
 ### 2.2 认知与情报型 Skill (Intelligence Skills)
 负责对原始数据进行初加工，为 Agent 提供更高维度的判断素材。
