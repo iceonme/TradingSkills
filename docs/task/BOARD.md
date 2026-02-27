@@ -30,6 +30,15 @@
 - [ ] 构建 PA 的 OODA 推理策略与 GridTool 双向增强
 - [ ] 开发 Squad Workspace UI (Members / Feed / War Room)
 
+### 3. CTS1 核心能力剥离与 Skill 化解耦 (TradingSkills) [/]
+> **目标**: 将原单体脚本重构为符合 TS 接口协议的标准化 Skill，实现执行、策略、监控的三层解耦。
+- **技术设计**: [ADR-001-System_Decoupling.md](../architecture/ADR-001-System_Decoupling.md)
+- **阶段归档**: [2026-02-28_00-34_Extract_ADR.md](./history/2026-02-28_00-34_Extract_ADR.md)
+- [x] 完成架构解耦设计与 TS 策略驱动型接口标准 (Interface Protocol)
+- [x] 剥离 `okx_trading_exe` 为独立的适配器网关 Skill (DataFeed/Executor 接口)
+- [ ] 剥离 `grid_rsi` 为纯粹的无状态分析策略 Skill
+- [ ] 将可视化前端 Dashboard 剥离为独立的观察者模块
+
 ---
 
 ## ✅ DONE (已完成)

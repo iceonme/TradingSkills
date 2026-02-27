@@ -25,10 +25,16 @@
   - **战略白皮书**: 整合 VISION、ROADMAP 与 INSIGHTS (开启 INS-XXX 编号体系)。
   - **战术看板**: 建立 [docs/task/BOARD.md](./task/BOARD.md)，替代原 `todo/` 目录。
   - **人机协作 (VibeCoding)**: 确立“脑内运行文件 ➔ 物理看板同步 ➔ 执行报告归档”的文件驱动模式。
-- **架构蓝图升级**: 
-  - 将 Agent 构建层扩展为 **8 大核心模块**（感知、思考、行动、记忆、自主、进化、节点、渠道）。
-  - 详细定义见 [INS-002: Agent 构建层框架](./insights/INS-002-agent-construction-layer-framework.md)。
-- **物理实现策略**: 针对 Node 和 Channel 确立了“接口保留、初期固化本地实现”的务实路线。
+## 当前进度摘要 (2026-02-28 02:08)
+- [x] **架构解耦 (TS Interface Protocol)**: 确立了 TradingSkills 模块三大分离标准 (DataFeed / Strategy / Executor)。
+- [x] **底层抽离**: 成功剔除网路层泥沼，实现了 `okx_trading_exe` 执行网关 Skill。测试完成连通性并加入了独特的 `Prompt-driven Auth` 保姆鉴权机制。
+- [x] **数据流向辨析**: 深入探讨了 Agent 回测模型下的 **Push (无状态被动喂入)** vs **Pull (主观拉取)** 问题，结论纪要保存在了 [INS-003](./insights/INS-003_Strategy_Data_Architecture.md)。
+
+## 接力棒: 下一步任务 (Next Steps)
+1. 建立 `grid_rsi_4.0_Jeff_Huang` 这个独立的纯函数策略微服务。
+   - 贯彻 Push 喂入的核心准则。
+   - 实现“智能跑腿外壳 (Agent Runner)”保护“纯净数学脑干 (core)”的设计。
+2. 完成数学计算 (3高3低与 RSI 逻辑) 的复刻并跑通一个模拟喂入的历史横切面测试。
 
 ---
 
