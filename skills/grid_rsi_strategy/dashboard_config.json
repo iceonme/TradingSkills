@@ -1,0 +1,49 @@
+{
+    "name": "grid-rsi-strategy",
+    "version": "1.0",
+    "description": "Dashboard layout configuration for Grid RSI Dynamic Strategy",
+    "charts": [
+        {
+            "id": "main_chart",
+            "type": "candlestick",
+            "overlays": [
+                {
+                    "name": "Grid Upper",
+                    "source": "signal.metadata.grid_upper",
+                    "color": "#ff4d4f",
+                    "style": "dashed"
+                },
+                {
+                    "name": "Grid Lower",
+                    "source": "signal.metadata.grid_lower",
+                    "color": "#52c41a",
+                    "style": "dashed"
+                }
+            ]
+        },
+        {
+            "id": "indicator_pane_1",
+            "type": "line",
+            "height_ratio": 0.3,
+            "series": [
+                {
+                    "name": "RSI(14)",
+                    "source": "signal.metadata.rsi",
+                    "color": "#1890ff"
+                },
+                {
+                    "name": "Overbought",
+                    "value": 70,
+                    "color": "#ff4d4f",
+                    "style": "dotted"
+                },
+                {
+                    "name": "Oversold",
+                    "value": 30,
+                    "color": "#52c41a",
+                    "style": "dotted"
+                }
+            ]
+        }
+    ]
+}

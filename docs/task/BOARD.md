@@ -36,7 +36,7 @@
 - **阶段归档**: [2026-02-28_00-34_Extract_ADR.md](./history/2026-02-28_00-34_Extract_ADR.md)
 - [x] 完成架构解耦设计与 TS 策略驱动型接口标准 (Interface Protocol)
 - [x] 剥离 `okx_trading_exe` 为独立的适配器网关 Skill (DataFeed/Executor 接口)
-- [ ] 剥离 `grid_rsi` 为纯粹的无状态分析策略 Skill
+- [x] 剥离 `grid_rsi` 为纯粹的无状态分析策略 Skill + 数据获取 Skill + 串联 Runner ([查看归档](./history/2026-03-01_15-45_Grid_Strategy_Refactor.md))
 - [ ] 将可视化前端 Dashboard 剥离为独立的观察者模块
 
 ---

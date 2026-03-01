@@ -15,7 +15,7 @@ def main():
     parser = argparse.ArgumentParser(description="Trading Execution Interface (TAS Standard)")
     parser.add_argument("--action", required=True, choices=[
         "get_balance", "get_positions", "place_market_order", 
-        "place_limit_order", "get_recent_trades"
+        "place_limit_order", "get_recent_trades", "execute_signal"
     ], help="The action to perform")
     
     parser.add_argument("--provider", required=True, choices=["okx_demo", "okx_live"], 
@@ -27,6 +27,8 @@ def main():
     parser.add_argument("--size", type=float, help="Order size (USDT amount for market buy, crypto amount for others)")
     parser.add_argument("--price", type=float, help="Order price (for limit orders)")
     parser.add_argument("--limit", type=int, default=20, help="Limit for history query")
+    parser.add_argument("--signal", type=str, help="JSON string representing a Signal object (used for execute_signal action)")
+    
     
     args = parser.parse_args()
     
@@ -81,6 +83,45 @@ def main():
                 sys.exit(1)
             trades = provider.get_recent_trades(args.symbol, args.limit)
             print(json.dumps({"trades": trades}))
+            
+        elif args.action == "execute_signal":
+            if not args.signal:
+                print(json.dumps({"error": "Missing required argument: --signal"}))
+                sys.exit(1)
+            try:
+                sig = json.loads(args.signal)
+            except json.JSONDecodeError:
+                print(json.dumps({"error": "Invalid JSON in --signal argument"}))
+                sys.exit(1)
+            
+            sig_action = sig.get("action", "HOLD")
+            if sig_action == "HOLD":
+                print(json.dumps({"status": "ignored", "reason": "Signal action is HOLD"}))
+                sys.exit(0)
+            
+            symbol = sig.get("symbol")
+            amount = sig.get("amount")
+            order_type = sig.get("order_type", "MARKET")
+            side = sig_action.lower()
+            
+            if not symbol or not amount:
+                print(json.dumps({"error": "Signal missing symbol or amount"}))
+                sys.exit(1)
+                
+            if order_type == "MARKET":
+                result = provider.place_market_order(symbol, side, amount)
+            elif order_type == "LIMIT":
+                price = sig.get("price")
+                if not price:
+                    print(json.dumps({"error": "Signal order_type is LIMIT but missing price"}))
+                    sys.exit(1)
+                result = provider.place_limit_order(symbol, side, amount, price)
+            else:
+                print(json.dumps({"error": f"Unknown order_type: {order_type}"}))
+                sys.exit(1)
+                
+            print(json.dumps({"status": "executed", "result": result, "signal": sig}))
+            
             
     except Exception as e:
         print(json.dumps({"error": str(e)}))
